@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #ffffff, #f0f8ff, #fff5f7, #f5f5ff, #fffef0, #f0fff4, #fff0f5, #ffffff);
+            background-size: 600% 600%;
+            animation: gradientShift 12s ease infinite;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .message-container {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .message {
+            font-family: 'Dosis', sans-serif;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+            padding: clamp(1rem, 3vw, 2rem);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            transform: scaleY(1.8);
+            cursor: pointer;
+            user-select: none;
+            background: transparent;
+            border: none;
+            transition: transform 0.5s ease;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.2;
+        }
+
+        .message:hover {
+            transform: scaleY(9);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-family: 'Dosis', sans-serif;
+            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+            color: rgba(0, 0, 0, 0.3);
+            opacity: 0.5;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="message-container" id="messageContainer">
+        <button class="message" id="messageBtn" onclick="redirectToLink()">
+            I'm dumb, please close this website
+        </button>
+    </div>
+    <div class="footer">
+        created by claude because I have no idea how to make one
+    </div>
+
+    <script>
+        // ===== CUSTOMIZABLE SETTINGS =====
+        const REDIRECT_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        const ANIMATION_DELAY = 300000; // 5 minutes in milliseconds
+        // =================================
+
+        const container = document.getElementById('messageContainer');
+        const messageBtn = document.getElementById('messageBtn');
+        let animationStarted = false;
+        let x, y, dx, dy;
+
+        function initializePosition() {
+            const containerRect = container.getBoundingClientRect();
+            x = (window.innerWidth - containerRect.width) / 2;
+            y = (window.innerHeight - containerRect.height) / 2;
+            dx = 2;
+            dy = 2;
+            
+            container.style.left = x + 'px';
+            container.style.top = y + 'px';
+        }
+
+        function redirectToLink() {
+            window.location.href = REDIRECT_URL;
+        }
+
+        function animate() {
+            if (!animationStarted) return;
+
+            const containerRect = container.getBoundingClientRect();
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
+
+            x += dx;
+            y += dy;
+
+            if (x + containerWidth >= window.innerWidth || x <= 0) {
+                dx = -dx;
+                x = Math.max(0, Math.min(x, window.innerWidth - containerWidth));
+            }
+
+            if (y + containerHeight >= window.innerHeight || y <= 0) {
+                dy = -dy;
+                y = Math.max(0, Math.min(y, window.innerHeight - containerHeight));
+            }
+
+            container.style.left = x + 'px';
+            container.style.top = y + 'px';
+
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize position after font loads
+        document.fonts.ready.then(() => {
+            initializePosition();
+        });
+
+        // Start animation after delay
+        setTimeout(() => {
+            animationStarted = true;
+            animate();
+        }, ANIMATION_DELAY);
+
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (!animationStarted) {
+                    initializePosition();
+                } else {
+                    const containerRect = container.getBoundingClientRect();
+                    x = Math.max(0, Math.min(x, window.innerWidth - containerRect.width));
+                    y = Math.max(0, Math.min(y, window.innerHeight - containerRect.height));
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
