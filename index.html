@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Message</title>
+    <title>This is so tuff tw 🥀</title>
     <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -80,6 +80,9 @@
             opacity: 0;
             transition: opacity 0.5s ease, background 0.3s ease;
             backdrop-filter: blur(5px);
+            /* initially place the hidden button at the bottom-right corner */
+            bottom: 16px;
+            right: 16px;
         }
 
         .hidden-button.visible {
@@ -120,6 +123,42 @@
 
         .debug-info.active {
             display: block;
+        }
+
+        /* Debug visual mode: high contrast and hitbox highlighting */
+        .debug-mode {
+            /* force dark page background and base text color */
+            background: #000 !important;
+            color: #fff !important;
+        }
+
+        /* ensure body background and other elements go dark */
+        .debug-mode body {
+            background: #000 !important;
+            background-image: none !important;
+            color: #fff !important;
+        }
+
+        .debug-mode .message {
+            color: #fff !important;
+            text-shadow: none !important;
+            background: rgba(255,255,255,0.02) !important;
+            box-shadow: 0 0 0 3px rgba(255,255,0,0.9) inset;
+            outline: 3px dashed rgba(255,255,0,0.85);
+            outline-offset: 6px;
+        }
+
+        .debug-mode .hidden-button {
+            border-color: #0f0 !important;
+            box-shadow: 0 0 10px #0f0 !important;
+            background: rgba(0,255,0,0.06) !important;
+            outline: 3px dashed rgba(0,255,0,0.9) !important;
+            outline-offset: 4px !important;
+            opacity: 1 !important; /* ensure visible while debugging */
+        }
+        .debug-mode .footer {
+            color: #fff !important;
+            opacity: 1 !important;
         }
     </style>
 </head>
@@ -281,6 +320,7 @@
                     case '0':
                         debugMode = !debugMode;
                         debugInfo.classList.toggle('active');
+                        setDebugVisuals(debugMode);
                         updateDebugStatus(debugMode ? 'Debug mode enabled' : 'Debug mode disabled');
                         break;
                     case '1':
@@ -337,6 +377,25 @@
             }
             return false;
         });
+
+        // Toggle debug visual mode: high-contrast + hitbox highlighting
+        function setDebugVisuals(enabled) {
+            try {
+                if (enabled) {
+                    document.documentElement.classList.add('debug-mode');
+                    // Ensure debug-only visibility for the hidden button
+                    hiddenButton.classList.add('visible');
+                } else {
+                    document.documentElement.classList.remove('debug-mode');
+                    // Revert visibility only if the button wasn't intended to be visible
+                    if (!buttonAnimationStarted) {
+                        hiddenButton.classList.remove('visible');
+                    }
+                }
+            } catch (err) {
+                console.error('setDebugVisuals error', err);
+            }
+        }
 
         // --- Deterrent: block common DevTools shortcuts and context menu ---
         // Note: This only deters casual users. It cannot stop a determined user.
