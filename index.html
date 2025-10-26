@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>This is so corny wtf</title>
+    <title>Message</title>
     <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -69,6 +69,28 @@
             transform: scaleY(9);
         }
 
+        .hidden-button {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(240, 248, 255, 0.3), rgba(255, 245, 247, 0.3));
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.5s ease, background 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .hidden-button.visible {
+            opacity: 1;
+        }
+
+        .hidden-button:hover {
+            background: linear-gradient(135deg, rgba(240, 248, 255, 0.5), rgba(255, 245, 247, 0.5));
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
         .footer {
             position: fixed;
             bottom: 10px;
@@ -81,28 +103,76 @@
             opacity: 0.5;
             z-index: 1000;
         }
+
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+            z-index: 2000;
+        }
+
+        .debug-info.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="message-container" id="messageContainer">
         <button class="message" id="messageBtn" onclick="redirectToLink()">
-            I'm dumb, please close this website immediately
+            I'm dumb, please close this website
         </button>
     </div>
+    
+    <button class="hidden-button" id="hiddenButton"></button>
+    
     <div class="footer">
-        created by claude because I have no fucking idea how to make one
+        created by claude because I have no idea how to make one
+    </div>
+
+    <div class="debug-info" id="debugInfo">
+        <div>Debug Mode Active</div>
+        <div id="debugStatus">Waiting...</div>
+        <div style="margin-top: 10px; font-size: 10px;">
+            Ctrl+Cmd+1: Start main animation<br>
+            Ctrl+Cmd+2: Show hidden button<br>
+            Ctrl+Cmd+3: Start button animation<br>
+            Ctrl+Cmd+0: Toggle debug panel
+        </div>
     </div>
 
     <script>
         // ===== CUSTOMIZABLE SETTINGS =====
-        const REDIRECT_URL = 'https://www.youtube.com/watch?v=ihnkWRO6RK8&t';
-        const ANIMATION_DELAY = 300000; // 5 minutes in milliseconds
+        const REDIRECT_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        const ANIMATION_DELAY = 300000; // 5 minutes - main message animation
+        const BUTTON_APPEAR_DELAY = 180000; // 3 minutes after animation starts
+        const BUTTON_FLY_DELAY = 2000; // 2 seconds after button appears
         // =================================
 
         const container = document.getElementById('messageContainer');
         const messageBtn = document.getElementById('messageBtn');
+        const hiddenButton = document.getElementById('hiddenButton');
+        const debugInfo = document.getElementById('debugInfo');
+        const debugStatus = document.getElementById('debugStatus');
+        
         let animationStarted = false;
+        let buttonAnimationStarted = false;
+        let debugMode = false;
         let x, y, dx, dy;
+        let buttonX, buttonY, buttonDx, buttonDy;
+
+        function updateDebugStatus(status) {
+            if (debugMode) {
+                debugStatus.textContent = status;
+                console.log('Debug:', status);
+            }
+        }
 
         function initializePosition() {
             const containerRect = container.getBoundingClientRect();
@@ -113,6 +183,16 @@
             
             container.style.left = x + 'px';
             container.style.top = y + 'px';
+        }
+
+        function initializeButtonPosition() {
+            buttonX = Math.random() * (window.innerWidth - 32);
+            buttonY = Math.random() * (window.innerHeight - 32);
+            buttonDx = 5; // Faster speed
+            buttonDy = 5;
+            
+            hiddenButton.style.left = buttonX + 'px';
+            hiddenButton.style.top = buttonY + 'px';
         }
 
         function redirectToLink() {
@@ -145,15 +225,88 @@
             requestAnimationFrame(animate);
         }
 
+        function animateButton() {
+            if (!buttonAnimationStarted) return;
+
+            buttonX += buttonDx;
+            buttonY += buttonDy;
+
+            if (buttonX + 32 >= window.innerWidth || buttonX <= 0) {
+                buttonDx = -buttonDx;
+                buttonX = Math.max(0, Math.min(buttonX, window.innerWidth - 32));
+            }
+
+            if (buttonY + 32 >= window.innerHeight || buttonY <= 0) {
+                buttonDy = -buttonDy;
+                buttonY = Math.max(0, Math.min(buttonY, window.innerHeight - 32));
+            }
+
+            hiddenButton.style.left = buttonX + 'px';
+            hiddenButton.style.top = buttonY + 'px';
+
+            requestAnimationFrame(animateButton);
+        }
+
+        function startMainAnimation() {
+            updateDebugStatus('Main animation started');
+            animationStarted = true;
+            animate();
+            
+            // Schedule button appearance
+            setTimeout(() => {
+                showHiddenButton();
+            }, debugMode ? 0 : BUTTON_APPEAR_DELAY);
+        }
+
+        function showHiddenButton() {
+            updateDebugStatus('Hidden button visible');
+            initializeButtonPosition();
+            hiddenButton.classList.add('visible');
+            
+            // Schedule button animation
+            setTimeout(() => {
+                startButtonAnimation();
+            }, debugMode ? 0 : BUTTON_FLY_DELAY);
+        }
+
+        function startButtonAnimation() {
+            updateDebugStatus('Button animation started (flying)');
+            buttonAnimationStarted = true;
+            animateButton();
+        }
+
+        // Keyboard shortcuts for debugging (Ctrl+Cmd+Key on macOS)
+        document.addEventListener('keydown', (e) => {
+            // Check for Ctrl+Cmd combination
+            if (e.ctrlKey && e.metaKey) {
+                switch(e.key) {
+                    case '0':
+                        debugMode = !debugMode;
+                        debugInfo.classList.toggle('active');
+                        updateDebugStatus(debugMode ? 'Debug mode enabled' : 'Debug mode disabled');
+                        break;
+                    case '1':
+                        startMainAnimation();
+                        break;
+                    case '2':
+                        showHiddenButton();
+                        break;
+                    case '3':
+                        startButtonAnimation();
+                        break;
+                }
+            }
+        });
+
         // Initialize position after font loads
         document.fonts.ready.then(() => {
             initializePosition();
+            updateDebugStatus('Initialized - waiting for animation delay');
         });
 
-        // Start animation after delay
+        // Start main animation after delay
         setTimeout(() => {
-            animationStarted = true;
-            animate();
+            startMainAnimation();
         }, ANIMATION_DELAY);
 
         // Handle window resize
@@ -167,6 +320,10 @@
                     const containerRect = container.getBoundingClientRect();
                     x = Math.max(0, Math.min(x, window.innerWidth - containerRect.width));
                     y = Math.max(0, Math.min(y, window.innerHeight - containerRect.height));
+                }
+                if (buttonAnimationStarted) {
+                    buttonX = Math.max(0, Math.min(buttonX, window.innerWidth - 32));
+                    buttonY = Math.max(0, Math.min(buttonY, window.innerHeight - 32));
                 }
             }, 100);
         });
