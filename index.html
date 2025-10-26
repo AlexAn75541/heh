@@ -327,6 +327,48 @@
                 }
             }, 100);
         });
+
+        // Make the hidden button open the raw text in a new tab (no conversion)
+        hiddenButton.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            try {
+                window.open('raw.html', '_blank', 'noopener');
+            } catch (err) {
+                window.location.href = 'raw.html';
+            }
+            return false;
+        });
+
+        // --- Deterrent: block common DevTools shortcuts and context menu ---
+        // Note: This only deters casual users. It cannot stop a determined user.
+        function blockDevToolsShortcuts(e) {
+            try {
+                const key = (e.key || '').toLowerCase();
+
+                // F12
+                if (e.key === 'F12' || key === 'f12') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                // Ctrl+Shift+I/C/J (Windows/Linux) or Cmd+Shift+I (mac) and Cmd+Opt+I
+                if ((e.ctrlKey && e.shiftKey && (key === 'i' || key === 'c' || key === 'j')) ||
+                    (e.metaKey && e.shiftKey && key === 'i') ||
+                    (e.metaKey && e.altKey && key === 'i')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            } catch (err) {
+                // ignore
+            }
+        }
+
+        document.addEventListener('keydown', blockDevToolsShortcuts, true);
+        document.addEventListener('contextmenu', function(ev) { ev.preventDefault(); return false; }, true);
+        document.addEventListener('mousedown', function(ev) { if (ev.button === 2 || ev.button === 1) { ev.preventDefault(); ev.stopPropagation(); return false; } }, true);
     </script>
 </body>
 </html>
