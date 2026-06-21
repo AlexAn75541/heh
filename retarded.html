@@ -80,7 +80,6 @@
             opacity: 0;
             transition: opacity 0.5s ease, background 0.3s ease;
             backdrop-filter: blur(5px);
-            /* initially place the hidden button at the bottom-right corner */
             bottom: 16px;
             right: 16px;
         }
@@ -125,14 +124,11 @@
             display: block;
         }
 
-        /* Debug visual mode: high contrast and hitbox highlighting */
         .debug-mode {
-            /* force dark page background and base text color */
             background: #000 !important;
             color: #fff !important;
         }
 
-        /* ensure body background and other elements go dark */
         .debug-mode body {
             background: #000 !important;
             background-image: none !important;
@@ -154,7 +150,7 @@
             background: rgba(0,255,0,0.06) !important;
             outline: 3px dashed rgba(0,255,0,0.9) !important;
             outline-offset: 4px !important;
-            opacity: 1 !important; /* ensure visible while debugging */
+            opacity: 1 !important;
         }
         .debug-mode .footer {
             color: #fff !important;
@@ -188,9 +184,9 @@
 
     <script>
         const REDIRECT_URL = 'https://youtu.be/ihnkWRO6RK8?si=wBPTIpC5OUhaAoj4';
-        const ANIMATION_DELAY = 300000; // 5 minutes - main message animation
-        const BUTTON_APPEAR_DELAY = 180000; // 3 minutes after animation starts
-        const BUTTON_FLY_DELAY = 2000; // 2 seconds after button appears
+        const ANIMATION_DELAY = 300000;
+        const BUTTON_APPEAR_DELAY = 180000;
+        const BUTTON_FLY_DELAY = 2000;
 
         const container = document.getElementById('messageContainer');
         const messageBtn = document.getElementById('messageBtn');
@@ -225,7 +221,7 @@
         function initializeButtonPosition() {
             buttonX = Math.random() * (window.innerWidth - 32);
             buttonY = Math.random() * (window.innerHeight - 32);
-            buttonDx = 5; // Faster speed
+            buttonDx = 5;
             buttonDy = 5;
             
             hiddenButton.style.left = buttonX + 'px';
@@ -289,7 +285,6 @@
             animationStarted = true;
             animate();
             
-            // Schedule button appearance
             setTimeout(() => {
                 showHiddenButton();
             }, debugMode ? 0 : BUTTON_APPEAR_DELAY);
@@ -300,7 +295,6 @@
             initializeButtonPosition();
             hiddenButton.classList.add('visible');
             
-            // Schedule button animation
             setTimeout(() => {
                 startButtonAnimation();
             }, debugMode ? 0 : BUTTON_FLY_DELAY);
@@ -312,9 +306,7 @@
             animateButton();
         }
 
-        // Keyboard shortcuts for debugging (Ctrl+Cmd+Key on macOS)
         document.addEventListener('keydown', (e) => {
-            // Check for Ctrl+Cmd combination
             if (e.ctrlKey && e.metaKey) {
                 switch(e.key) {
                     case '0':
@@ -336,18 +328,15 @@
             }
         });
 
-        // Initialize position after font loads
         document.fonts.ready.then(() => {
             initializePosition();
             updateDebugStatus('Initialized - waiting for animation delay');
         });
 
-        // Start main animation after delay
         setTimeout(() => {
             startMainAnimation();
         }, ANIMATION_DELAY);
 
-        // Handle window resize
         let resizeTimeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
@@ -366,7 +355,6 @@
             }, 100);
         });
 
-        // Make the hidden button open the raw text in a new tab (no conversion)
         hiddenButton.addEventListener('click', (ev) => {
             ev.preventDefault();
             ev.stopPropagation();
@@ -378,16 +366,13 @@
             return false;
         });
 
-        // Toggle debug visual mode: high-contrast + hitbox highlighting
         function setDebugVisuals(enabled) {
             try {
                 if (enabled) {
                     document.documentElement.classList.add('debug-mode');
-                    // Ensure debug-only visibility for the hidden button
                     hiddenButton.classList.add('visible');
                 } else {
                     document.documentElement.classList.remove('debug-mode');
-                    // Revert visibility only if the button wasn't intended to be visible
                     if (!buttonAnimationStarted) {
                         hiddenButton.classList.remove('visible');
                     }
@@ -397,20 +382,16 @@
             }
         }
 
-        // --- Deterrent: block common DevTools shortcuts and context menu ---
-        // Note: This only deters casual users. It cannot stop a determined user.
         function blockDevToolsShortcuts(e) {
             try {
                 const key = (e.key || '').toLowerCase();
 
-                // F12
                 if (e.key === 'F12' || key === 'f12') {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
 
-                // Ctrl+Shift+I/C/J (Windows/Linux) or Cmd+Shift+I (mac) and Cmd+Opt+I
                 if ((e.ctrlKey && e.shiftKey && (key === 'i' || key === 'c' || key === 'j')) ||
                     (e.metaKey && e.shiftKey && key === 'i') ||
                     (e.metaKey && e.altKey && key === 'i')) {
