@@ -57,33 +57,6 @@ const MOCK_FS = {
   }
 };
 
-
-function runFastfetchMock() {
-  // ASCII art logo of "7" aligned to left (default fastfetch style)
-  const logo = [
-    "      \x1b[1;32m     _\x1b[0m",
-    "      \x1b[1;32m    /|\x1b[0m",
-    "      \x1b[1;32m   /_\\\x1b[0m",
-    "  \x1b[1;32m██████\x1b[0m ",
-    "  \x1b[1;32m██████\x1b[0m ",
-    "      \x1b[1;32mgit\x1b[0m"
-  ];
-
-  const fields = [
-    "\x1b[7mHost:\t\tlocalhost\x1b[0m",
-    "\x1b[7mOS:\t\tSome dudes with HolyC or smth idk\x1b[0m",
-    "Kernel: \tx.x.x-x (fake)",
-    "Uptime: \tup 42 min, load avg. 35 / - / -"
-  ];
-
-  fields.forEach(label => {
-    label += "\x1b[7mCPU:\t\t\x1b[0mIntel Core i9-9800XK".repeat(3);
-    for (let j = 0; j < Math.random() * 5 + 2; j++) {
-      label += " ".repeat(Math.random() * 4 + 1) + randomGibberish(36 - label.length, true);
-    }
-
-    fields.push(label);
-  });
 const term = new Terminal({
   cursorBlink: true,
   fontFamily: FONT_STACKS[CONFIG.DEFAULT_FONT],
@@ -150,18 +123,21 @@ function randomGibberish(maxLen) {
 }
 
 function runFastfetchMock() {
-  // TempleOS or smth
+  const logoWidth = 14;
+  
+  // Injected two lines of 14 spaces to shift the graphic down, 
+  // while maintaining the structural wall for the text on the right.
   const logo = [
-    "      \x1b[1;33m██\x1b[0m      ",
-    "      \x1b[1;33m██\x1b[0m      ",
-    "      \x1b[1;33m██\x1b[0m      ",
-    "  \x1b[1;33m██████████\x1b[0m  ",
-    "  \x1b[1;33m██████████\x1b[0m  ",
-    "      \x1b[1;33m██\x1b[0m      ",
-    "      \x1b[1;33m██\x1b[0m      ",
-    "      \x1b[1;33m██\x1b[0m      "
+    " ".repeat(logoWidth),
+    " ".repeat(logoWidth),
+    "\x1b[1;36m   ██████████ \x1b[0m",
+    "\x1b[1;36m          ██  \x1b[0m",
+    "\x1b[1;36m         ██   \x1b[0m",
+    "\x1b[1;36m        ██    \x1b[0m",
+    "\x1b[1;36m       ██     \x1b[0m",
+    "\x1b[1;36m      ██      \x1b[0m",
+    "\x1b[1;36m     ██       \x1b[0m"
   ];
-  const logoWidth = 14; // visible character width of each logo line above
 
   const fields = [
     "OS",
@@ -175,32 +151,30 @@ function runFastfetchMock() {
     "Memory"
   ];
 
+  const maxKeyLen = Math.max(...fields.map(label => label.length));
+
   const info = [
     `\x1b[1;36maretzera\x1b[0m@\x1b[1;36mfuckyou\x1b[0m`,
-    "-".repeat(17)
+    "----------------"
   ];
+  
   fields.forEach(label => {
-    info.push(`${label}: ${randomGibberish(20)}`);
+    const paddedLabel = label.padStart(maxKeyLen, ' ');
+    // Assuming randomGibberish is defined elsewhere in your script
+    info.push(`\x1b[1;36m${paddedLabel}\x1b[0m: ${randomGibberish(20)}`);
   });
 
   const maxLines = Math.max(logo.length, info.length);
-  const gap = "    ";
+  const gap = "    "; 
   const lines = [];
+  
   for (let i = 0; i < maxLines; i++) {
     const left = logo[i] !== undefined ? logo[i] : " ".repeat(logoWidth);
     const right = info[i] || "";
     lines.push(left + gap + right);
   }
 
-  // center the whole block horizontally based on current terminal column count
-  // const termCols = term.cols || 80;
-  // visible width estimate, ignoring ansi escapes, using logoWidth + gap + longest info line
-  const longestInfo = info.reduce((m, s) => Math.max(m, s.replace(/\x1b\[[0-9;]*m/g, '').length), 0);
-  const blockWidth = logoWidth + gap.length + longestInfo;
-  const padLeft = Math.max(0, Math.floor((termCols - blockWidth) / 2));
-  const padStr = " ".repeat(padLeft);
-
-  return lines.map(l => padStr + l).join("\r\n") + "\r\n";
+  return lines.join("\r\n") + "\r\n";
 }
 
 // =====================================================================
