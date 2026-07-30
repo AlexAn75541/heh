@@ -3,7 +3,7 @@
 // Edit these values to change behavior without touching logic below.
 // =====================================================================
 const CONFIG = {
-  RM_RF_REDIRECT_URL: "http://zooqle.com@sh.21111993.xyz/system@redtube.com/illegal-heap-ransomware-botnet.pkg-31084426?nosql=1&bind=ready&encryption&terrorist&xss&pointer=enabled&premium&jailbreak=1&private=initialized&malware=1&darkweb=detected&overflow=active&sql&decoding",
+  RM_RF_REDIRECT_URL: "http://kickasstorrents.to@sh.21111993.xyz/payload@pornhub.com/bomb-exploit.zip-54ba3725?forbidden=online&leaked&exploit&hijacker&honeypot&backdoor=1&illegal&keylogger=installed&injection=installed&vulnerability&decryption=true&flooding=executing",
   SUPERSEKRET_URL: "https://www.youtube.com/watch?v=ihnkWRO6RK8",
   OLD_WEBSITE_URL: "retarded.html",
   DEFAULT_BG: "#000000",
